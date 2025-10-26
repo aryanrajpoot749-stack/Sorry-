@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ek Chhota Surprise</title>
+  <style>
+    :root{--bg:#0f172a;--card:#111827;--accent:#f59e0b}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans",sans-serif;background:linear-gradient(180deg,#071029 0%, #0f172a 100%);color:#fff;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px}
+    .wrap{width:100%;max-width:520px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border-radius:14px;padding:26px;box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+    h1{margin:0 0 10px;font-size:20px}
+    p.lead{margin:0 0 18px;opacity:0.9}
+    .input{display:flex;gap:8px}
+    input[type="password"]{flex:1;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;font-size:16px;outline:none}
+    button{padding:12px 16px;border-radius:10px;border:0;background:var(--accent);color:#000;font-weight:600;cursor:pointer}
+    .note{margin-top:18px;padding:16px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));display:none}
+    .big{font-size:18px;margin:0 0 8px}
+    .sub{margin:0;opacity:0.9}
+    .hidden{display:none}
+    .img-wrap{margin-top:12px;border-radius:8px;overflow:hidden}
+    img{width:100%;height:auto;display:block}
+    .center{display:flex;gap:8px;align-items:center;justify-content:center}
+    .hint{margin-top:12px;color:rgba(255,255,255,0.6);font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="wrap" role="main">
+    <h1>Ek chhota surprise - sirf tumhare liye</h1>
+    <p class="lead">Password dal kar kholo. Jo tumhare liye specially likha hai — dil se.</p>
+
+    <div class="input" aria-hidden="false">
+      <input id="pw" type="password" placeholder="Password daalo" aria-label="Password" />
+      <button id="go">Open</button>
+    </div>
+    <div class="hint">Hint: Agar tum chahte ho, password mein emoji ya number use kar sakte ho.</div>
+
+    <div id="note" class="note" role="region" aria-live="polite">
+      <p class="big" id="noteTitle">—</p>
+      <p class="sub" id="noteBody">—</p>
+
+      <div class="img-wrap" id="imgWrap" style="display:none">
+        <img id="heroImg" src="" alt="Surprise image" />
+      </div>
+
+      <div style="margin-top:12px" id="extraArea"></div>
+    </div>
+
+    <p class="hint">Ye page simple password-guarded client-side page hai — bahut zyada sensitive secrets ke liye server-side solution use karo.</p>
+  </div>
+
+  <!-- confetti lib -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <script>
+    // === customize these values ===
+    const CORRECT = "love123"; // <-- set your password here
+    const TITLE = "Tumhare liye ek surprise 💌";
+    const BODY = "Hey! Maine yeh note specially tumhare liye likha hai. Aaj tumhari smile hi mera sab kuch hai. ❤️\n\nMilke chai pe milte hain? ☕️";
+    const IMAGE_URL = "https://images.unsplash.com/photo-1505238680356-667803448bb6?q=80&w=1200&auto=format&fit=crop"; // replace or leave empty
+    // const AUDIO_URL = "audio.mp3"; // optional: add file in repo and set path
+    // ===============================
+
+    const pwInput = document.getElementById('pw');
+    const goBtn = document.getElementById('go');
+    const note = document.getElementById('note');
+    const noteTitle = document.getElementById('noteTitle');
+    const noteBody = document.getElementById('noteBody');
+    const imgWrap = document.getElementById('imgWrap');
+    const heroImg = document.getElementById('heroImg');
+    const extraArea = document.getElementById('extraArea');
+
+    function showConfetti() {
+      // small burst
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.4 }
+      });
+    }
+
+    function reveal() {
+      noteTitle.textContent = TITLE;
+      noteBody.textContent = BODY;
+      if (IMAGE_URL && IMAGE_URL.length) {
+        heroImg.src = IMAGE_URL;
+        imgWrap.style.display = 'block';
+      }
+      // optional audio
+      // const audio = document.createElement('audio');
+      // audio.src = AUDIO_URL;
+      // audio.autoplay = true;
+      // audio.controls = true;
+      // extraArea.appendChild(audio);
+
+      note.style.display = 'block';
+      showConfetti();
+      // small second confetti
+      setTimeout(showConfetti, 500);
+    }
+
+    goBtn.addEventListener('click', () => {
+      const attempt = pwInput.value;
+      if (attempt === CORRECT) {
+        reveal();
+      } else {
+        // gentle shake + hint
+        pwInput.value = '';
+        pwInput.placeholder = 'Galat password, dobara try karo';
+        pwInput.focus();
+        // subtle visual hint
+        pwInput.style.animation = 'shake 0.35s';
+        setTimeout(()=> pwInput.style.animation = '', 400);
+      }
+    });
+
+    // press enter
+    pwInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') goBtn.click();
+    });
+
+    // small shake keyframes
+    const style = document.createElement('style');
+    style.textContent = `@keyframes shake { 10%{transform:translateX(-6px)}30%{transform:translateX(6px)}50%{transform:translateX(-4px)}70%{transform:translateX(4px)}90%{transform:translateX(-2px)}100%{transform:translateX(0)} }`;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>
